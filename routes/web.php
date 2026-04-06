@@ -23,6 +23,9 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('posts', PostController::class);
     Route::get('/tags/search', [TagController::class, 'search'])->name('tags.search');
+    Route::get('/my-posts', [PostController::class, 'myPosts'])->name('posts.my');
+    Route::get('/search', [PostController::class, 'search'])->name('posts.search');
+    Route::get('/search/results', [PostController::class, 'searchResults'])->name('posts.searchResults');
     
     Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
     Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');

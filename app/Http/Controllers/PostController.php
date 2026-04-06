@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\Category;
 use App\Models\Tag;
+use App\Models\Comment;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
@@ -13,6 +14,53 @@ class PostController extends Controller
     {
         $posts = Post::with(['user', 'category'])->latest()->get();
         return view('posts.index', compact('posts'));
+    }
+
+    public function myPosts()
+    {
+        $myPosts = Post::with(['user', 'category'])->where('user_id', auth()->id())->latest()->get();
+        $myComments = Comment::with(['user', 'post'])->where('user_id', auth()->id())->latest()->get();
+        $myComments->load('post');
+        return view('posts.my-posts', compact('myPosts', 'myComments'));
+    }
+
+    public function search()
+    {
+        $categories = Category::all();
+        $selectedTags = [];
+        return view('posts.search', compact('categories', 'selectedTags'));
+    }
+
+    public function searchResults(Request $request)
+    {
+        $query = Post::with(['user', 'category', 'tags']);
+
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'like', "%{$searchTerm}%")
+                  ->orWhere('body', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        if ($request->filled('tags')) {
+            $tagNames = is_array($request->tags) ? $request->tags : json_decode($request->tags, true) ?? [];
+            if (!empty($tagNames)) {
+                $query->whereHas('tags', function($q) use ($tagNames) {
+                    $q->whereIn('name', $tagNames);
+                });
+            }
+        }
+
+        $posts = $query->latest()->get();
+        $categories = Category::all();
+        $selectedTags = is_array($request->tags) ? $request->tags : json_decode($request->tags, true) ?? [];
+        
+        return view('posts.search', compact('posts', 'categories', 'selectedTags'));
     }
 
     public function show(Post $post)
