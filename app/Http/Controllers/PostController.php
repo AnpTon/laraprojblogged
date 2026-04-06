@@ -49,6 +49,10 @@ class PostController extends Controller
 
     public function edit(Post $post)
     {
+        if ($post->user_id !== auth()->id() && !auth()->user()->isAdmin()) {
+            return back()->with('error', 'You can only edit your own posts.');
+        }
+
         $categories = Category::all();
         $post->load('tags');
         return view('posts.edit', compact('post', 'categories'));
@@ -56,6 +60,10 @@ class PostController extends Controller
 
     public function update(Request $request, Post $post)
     {
+        if ($post->user_id !== auth()->id() && !auth()->user()->isAdmin()) {
+            return back()->with('error', 'You can only edit your own posts.');
+        }
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'body' => 'required|string',
@@ -86,6 +94,10 @@ class PostController extends Controller
 
     public function destroy(Post $post)
     {
+        if ($post->user_id !== auth()->id() && !auth()->user()->isAdmin()) {
+            return back()->with('error', 'You can only delete your own posts.');
+        }
+
         $post->delete();
         return redirect()->route('dashboard')->with('success', 'Post deleted successfully.');
     }
