@@ -3,10 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tag;
+use App\Models\Post;
 use Illuminate\Http\Request;
 
 class TagController extends Controller
 {
+    public function index()
+    {
+        $tags = Tag::withCount('posts')->get();
+        return view('tags.index', compact('tags'));
+    }
+
     public function search(Request $request)
     {
         $query = $request->query('q', '');
@@ -20,5 +27,11 @@ class TagController extends Controller
             ->get(['id', 'name']);
 
         return response()->json($tags);
+    }
+
+    public function destroy(Tag $tag)
+    {
+        $tag->delete();
+        return redirect()->route('tags.index')->with('success', 'Tag deleted successfully.');
     }
 }

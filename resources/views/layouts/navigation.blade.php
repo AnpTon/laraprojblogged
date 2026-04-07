@@ -18,6 +18,14 @@
                     <x-nav-link :href="route('posts.search')" :active="request()->routeIs('posts.search')">
                         {{ __('Search') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.index')">
+                        {{ __('Categories') }}
+                    </x-nav-link>
+                    @if(Auth::user()->isAdmin())
+                    <x-nav-link :href="route('tags.index')" :active="request()->routeIs('tags.index')">
+                        {{ __('Tags') }}
+                    </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -80,6 +88,14 @@
             <x-responsive-nav-link :href="route('posts.search')" :active="request()->routeIs('posts.search')">
                 {{ __('Search') }}
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.index')">
+                {{ __('Categories') }}
+            </x-responsive-nav-link>
+            @if(Auth::user()->isAdmin())
+            <x-responsive-nav-link :href="route('tags.index')" :active="request()->routeIs('tags.index')">
+                {{ __('Tags') }}
+            </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->
